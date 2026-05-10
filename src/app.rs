@@ -10,7 +10,7 @@ use crate::config::helium_config_dir;
 use crate::constants::*;
 use crate::models::{AvatarImage, Profile, ProfileView};
 use crate::process::launch;
-use crate::ui::{header, profile_card, url_row};
+use crate::ui::{header, profile_card};
 
 pub(crate) struct HeliumApp {
     pub(crate) url: Option<String>,
@@ -84,13 +84,8 @@ impl HeliumApp {
     pub(crate) fn window_height(&self) -> f32 {
         let rows = ((self.profiles.len() as f32) / self.column_count() as f32).ceil() as usize;
         let header = HEADER_HEIGHT;
-        let url = if self.url.is_some() {
-            URL_ROW_HEIGHT + CONTENT_GAP * 0.75
-        } else {
-            0.0
-        };
         let grid = rows as f32 * CARD_HEIGHT + rows.saturating_sub(1) as f32 * PROFILE_ROW_GAP;
-        2.0 * PANEL_INNER_PADDING + header + url + CONTENT_GAP + grid
+        2.0 * PANEL_INNER_PADDING + header + CONTENT_GAP + grid
     }
 
     pub(crate) fn column_count(&self) -> usize {
@@ -217,11 +212,7 @@ impl eframe::App for HeliumApp {
                     egui::UiBuilder::new().max_rect(panel_rect.shrink(PANEL_INNER_PADDING)),
                     |ui| {
                         ui.vertical(|ui| {
-                            header(ui, ctx);
-                            if let Some(url) = &self.url {
-                                url_row(ui, url);
-                                ui.add_space(6.0);
-                            }
+                            header(ui, ctx, self.url.as_deref());
                             ui.add_space(8.0);
                             self.profile_grid(ui, ctx);
                             if let Some(err) = &self.error {
