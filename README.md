@@ -1,15 +1,9 @@
 # Helium Profile Picker
 
-A small, beautiful, cross-platform profile picker for Helium, rewritten in Rust.
+A small, beautiful, cross-platform profile picker for Helium, written in Rust.
 
-## Highlights
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/c3eef927-7363-484c-948d-f8cf447b1633" />
 
-- Rust + egui/eframe
-- Cross-platform: Linux, macOS, Windows
-- No runtime Python or GTK dependencies
-- Modern dark UI inspired by the original Python version
-- Profile avatars and custom avatars when available
-- Falls back to initials if no image is available
 
 ## Build
 
