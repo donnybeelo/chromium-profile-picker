@@ -62,7 +62,7 @@ pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str) {
     painter.rect_stroke(
         inner,
         CornerRadius::same(19),
-        Stroke::new(1.0, Color32::from_rgb(0x3a, 0x3a, 0x3a)),
+        Stroke::new(1.0, BORDER),
         StrokeKind::Outside,
     );
     painter.text(
@@ -86,21 +86,14 @@ pub(crate) fn profile_card(
     let hovered = ui.rect_contains_pointer(rect);
     let clicked = response.is_pointer_button_down_on();
 
-    let bg = if clicked { CARD_BG_CLICKED } else if hovered { CARD_BG_HOVER } else { CARD_BG };
+    let bg = if clicked {
+        CARD_BG_CLICKED
+    } else if hovered {
+        CARD_BG_HOVER
+    } else {
+        Color32::TRANSPARENT
+    };
     painter.rect_filled(rect, CornerRadius::same(18), bg);
-    painter.rect_stroke(
-        rect,
-        CornerRadius::same(18),
-        Stroke::new(
-            1.0,
-            if hovered {
-                Color32::from_rgb(0x44, 0x44, 0x44)
-            } else {
-                BORDER
-            },
-        ),
-        StrokeKind::Inside,
-    );
 
     let avatar_size = Vec2::splat(122.0);
     let avatar_rect =
@@ -109,7 +102,7 @@ pub(crate) fn profile_card(
     painter.rect_stroke(
         avatar_rect,
         CornerRadius::same(18),
-        Stroke::new(1.0, AVATAR_BORDER),
+        Stroke::new(1.0, BORDER),
         StrokeKind::Outside,
     );
 
@@ -179,8 +172,9 @@ pub(crate) fn draw_circle_close_button(ui: &mut egui::Ui, rect: Rect) -> Respons
     let hovered = ui.rect_contains_pointer(rect);
     let fill = if hovered { CLOSE_BG_HOVER } else { CLOSE_BG };
     let center = rect.center();
-    let radius = rect.width() / 2.0;
+    let radius = rect.width() / 2.0 - 1.5;
     painter.circle_filled(center, radius, fill);
+    painter.circle_stroke(center, radius, Stroke::new(1.0, BORDER));
 
     let stroke = Stroke::new(2.0, TEXT);
     let d = 4.0;
