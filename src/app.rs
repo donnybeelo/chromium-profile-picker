@@ -205,7 +205,7 @@ impl eframe::App for HeliumApp {
                     panel_rect,
                     CornerRadius::same(30),
                     Stroke::new(1.0, Color32::from_rgb(0x2f, 0x2f, 0x2f)),
-                    StrokeKind::Outside,
+                    StrokeKind::Inside,
                 );
 
                 ui.scope_builder(

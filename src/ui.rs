@@ -84,8 +84,9 @@ pub(crate) fn profile_card(
     let response = ui.interact(rect, ui.id().with(("profile_card", index)), Sense::click());
     let painter = ui.painter_at(rect);
     let hovered = ui.rect_contains_pointer(rect);
+    let clicked = response.is_pointer_button_down_on();
 
-    let bg = if hovered { CARD_BG_HOVER } else { CARD_BG };
+    let bg = if clicked { CARD_BG_CLICKED } else if hovered { CARD_BG_HOVER } else { CARD_BG };
     painter.rect_filled(rect, CornerRadius::same(18), bg);
     painter.rect_stroke(
         rect,
@@ -98,7 +99,7 @@ pub(crate) fn profile_card(
                 BORDER
             },
         ),
-        StrokeKind::Outside,
+        StrokeKind::Inside,
     );
 
     let avatar_size = Vec2::splat(122.0);
@@ -113,12 +114,13 @@ pub(crate) fn profile_card(
     );
 
     if let Some(avatar) = avatar {
-        let fitted = fit_inside(avatar_rect.shrink(4.0), avatar.size);
-        painter.image(
-            avatar.texture.id(),
-            fitted,
-            Rect::from_min_max(Pos2::ZERO, Pos2::new(1.0, 1.0)),
-            Color32::WHITE,
+        let fitted = fit_inside(avatar_rect, avatar.size);
+        painter.add(
+            egui::epaint::RectShape::filled(fitted, CornerRadius::same(18), Color32::WHITE)
+                .with_texture(
+                    avatar.texture.id(),
+                    Rect::from_min_max(Pos2::ZERO, Pos2::new(1.0, 1.0)),
+                ),
         );
     } else {
         painter.text(
@@ -130,16 +132,22 @@ pub(crate) fn profile_card(
         );
     }
 
+    const BADGE_WIDTH: f32 = 36.0;
+    const BADGE_HEIGHT: f32 = 24.0;
+
     let badge_rect = Rect::from_min_size(
-        Pos2::new(avatar_rect.max.x - 36.0, avatar_rect.max.y - 26.0),
-        Vec2::new(36.0, 24.0),
+        Pos2::new(
+            avatar_rect.max.x - BADGE_WIDTH - 4.0,
+            avatar_rect.max.y - BADGE_HEIGHT - 4.0,
+        ),
+        Vec2::new(BADGE_WIDTH, BADGE_HEIGHT),
     );
     painter.rect_filled(badge_rect, CornerRadius::same(12), BADGE_BG);
     painter.rect_stroke(
         badge_rect,
         CornerRadius::same(12),
         Stroke::new(1.0, BADGE_BORDER),
-        StrokeKind::Outside,
+        StrokeKind::Inside,
     );
     painter.text(
         badge_rect.center(),
