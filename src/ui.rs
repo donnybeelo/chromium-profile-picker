@@ -14,13 +14,25 @@ pub(crate) fn fit_inside(container: Rect, image_size: Vec2) -> Rect {
 pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>) {
     let width = ui.available_width();
     let height = HEADER_HEIGHT;
-    let (rect, response) =
-        ui.allocate_exact_size(Vec2::new(width, height), Sense::click_and_drag());
-    if response.drag_started() {
+    let (rect, _) = ui.allocate_exact_size(Vec2::new(width, height), Sense::hover());
+
+    let painter = ui.painter_at(rect);
+    let close_rect = Rect::from_min_size(
+        Pos2::new(rect.max.x - URL_ROW_HEIGHT, rect.top() - 5.0),
+        Vec2::splat(URL_ROW_HEIGHT),
+    );
+    let drag_rect = Rect::from_min_max(
+        Pos2::new(
+            rect.left() - PANEL_INNER_PADDING,
+            rect.top() - PANEL_INNER_PADDING,
+        ),
+        Pos2::new(rect.right() + PANEL_INNER_PADDING, rect.bottom() - CONTENT_GAP),
+    );
+    let drag_response = ui.interact(drag_rect, ui.id().with("header_drag_zone"), Sense::click());
+    if drag_response.is_pointer_button_down_on() && ctx.input(|i| i.pointer.primary_pressed()) {
         ctx.send_viewport_cmd(egui::ViewportCommand::StartDrag);
     }
 
-    let painter = ui.painter_at(rect);
     if let Some(url) = url {
         let address_rect = Rect::from_min_size(
             Pos2::new(rect.left() + 2.0, rect.top() - 5.0),
@@ -41,10 +53,6 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>) 
         }
     }
 
-    let close_rect = Rect::from_min_size(
-        Pos2::new(rect.max.x - URL_ROW_HEIGHT, rect.top() - 5.0),
-        Vec2::splat(URL_ROW_HEIGHT),
-    );
     let close = draw_circle_close_button(ui, close_rect);
     if close.clicked() {
         ctx.send_viewport_cmd(egui::ViewportCommand::Close);

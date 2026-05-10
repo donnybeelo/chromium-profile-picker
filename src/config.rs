@@ -11,10 +11,12 @@ pub(crate) fn normalize_url(raw: &str) -> Option<String> {
 
     if raw.contains("://") {
         return Some(raw.to_owned());
-    }
-    if raw.starts_with("//") {
+    } else if raw.starts_with("//") {
         return Some(format!("https:{raw}"));
-    }
+    } else if raw.starts_with('/') {
+		return Some(raw.to_owned());
+	}
+	
     Some(format!("https://{raw}"))
 }
 
