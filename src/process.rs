@@ -1,4 +1,5 @@
 use std::env;
+use std::path::Path;
 
 use std::process::{Command, Stdio};
 
@@ -12,7 +13,7 @@ pub(crate) fn resolve_helium_bin() -> String {
     if let Some(path) = which("helium") {
         return path;
     }
-    if let Some(path) = which("helium.exe") {
+    if let Some(path) = which("chrome.exe") {
         return path;
     }
 
@@ -21,6 +22,20 @@ pub(crate) fn resolve_helium_bin() -> String {
         let candidates = [
             "/Applications/Helium.app/Contents/MacOS/Helium",
             "/Applications/Helium.app/Contents/MacOS/helium",
+        ];
+        for candidate in candidates {
+            if Path::new(candidate).exists() {
+                return candidate.to_owned();
+            }
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        let candidates = [
+            r"C:\Program Files\Helium\Application\chrome.exe",
+            r"C:\Program Files (x86)\Helium\Application\chrome.exe",
+            r"C:\Users\delia\AppData\Local\imput\Helium\Application\chrome.exe",
         ];
         for candidate in candidates {
             if Path::new(candidate).exists() {

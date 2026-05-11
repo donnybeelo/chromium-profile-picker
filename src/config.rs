@@ -14,9 +14,9 @@ pub(crate) fn normalize_url(raw: &str) -> Option<String> {
     } else if raw.starts_with("//") {
         return Some(format!("https:{raw}"));
     } else if raw.starts_with('/') {
-		return Some(raw.to_owned());
-	}
-	
+        return Some(raw.to_owned());
+    }
+
     Some(format!("https://{raw}"))
 }
 
@@ -28,6 +28,18 @@ pub(crate) fn app_config_dir() -> PathBuf {
     #[cfg(target_os = "windows")]
     {
         if let Ok(base) = env::var("LOCALAPPDATA").or_else(|_| env::var("APPDATA")) {
+            let candidates = [
+                PathBuf::from(&base).join(APP_ID),
+                PathBuf::from(&base)
+                    .join("imput")
+                    .join("Helium")
+                    .join("User Data"),
+            ];
+            for candidate in candidates {
+                if candidate.exists() {
+                    return candidate;
+                }
+            }
             return PathBuf::from(base).join(APP_ID);
         }
         if let Some(home) = dirs_home() {

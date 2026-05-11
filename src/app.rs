@@ -78,7 +78,7 @@ impl HeliumApp {
     pub(crate) fn window_width(&self) -> f32 {
         let cols = self.column_count();
         let gaps = cols.saturating_sub(1) as f32 * CARD_MARGIN_X;
-        2.0 * PANEL_INNER_PADDING + cols as f32 * CARD_WIDTH + gaps
+        2.0 * PANEL_INNER_PADDING + std::cmp::max(cols, 2.0 as usize) as f32 * CARD_WIDTH + gaps
     }
 
     pub(crate) fn window_height(&self) -> f32 {
@@ -123,31 +123,34 @@ impl HeliumApp {
                 count as f32 * CARD_WIDTH + count.saturating_sub(1) as f32 * CARD_MARGIN_X;
 
             ui.horizontal_centered(|ui| {
-                ui.allocate_ui_with_layout(
-                    Vec2::new(row_width, CARD_HEIGHT),
-                    egui::Layout::left_to_right(egui::Align::Center),
-                    |ui| {
-                        ui.spacing_mut().item_spacing = Vec2::new(CARD_MARGIN_X, 0.0);
-                        for idx in start..end {
-                            let (card_rect, _) = ui.allocate_exact_size(
-                                Vec2::new(CARD_WIDTH, CARD_HEIGHT),
-                                Sense::hover(),
-                            );
+                ui.vertical_centered(|ui| {
+                    ui.allocate_ui_with_layout(
+                        Vec2::new(row_width, CARD_HEIGHT),
+                        egui::Layout::left_to_right(egui::Align::Center),
+                        |ui| {
+                            ui.spacing_mut().item_spacing = Vec2::new(CARD_MARGIN_X, 0.0);
+                            for idx in start..end {
+                                let (card_rect, _) = ui.allocate_exact_size(
+                                    Vec2::new(CARD_WIDTH, CARD_HEIGHT),
+                                    Sense::hover(),
+                                );
 
-                            let view = &self.profiles[idx];
-                            let path = self.avatar_path_for(view);
-                            let avatar = path
-                                .as_ref()
-                                .and_then(|p| self.avatars.get(&p.to_string_lossy().to_string()));
-                            let response = profile_card(ui, card_rect, &view.profile, idx, avatar);
-                            if response.clicked() {
-                                let dir = view.profile.directory.clone();
-                                let _ = self.launch_profile(&dir);
-                                ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                                let view = &self.profiles[idx];
+                                let path = self.avatar_path_for(view);
+                                let avatar = path.as_ref().and_then(|p| {
+                                    self.avatars.get(&p.to_string_lossy().to_string())
+                                });
+                                let response =
+                                    profile_card(ui, card_rect, &view.profile, idx, avatar);
+                                if response.clicked() {
+                                    let dir = view.profile.directory.clone();
+                                    let _ = self.launch_profile(&dir);
+                                    ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                                }
                             }
-                        }
-                    },
-                );
+                        },
+                    );
+                })
             });
             if row + 1 < rows {
                 ui.add_space(PROFILE_ROW_GAP);
