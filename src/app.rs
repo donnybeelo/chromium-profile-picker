@@ -5,6 +5,11 @@ use anyhow::Result;
 use eframe::{egui, egui::Vec2};
 use egui::{Color32, CornerRadius, Sense, Stroke, StrokeKind};
 
+#[cfg(target_os = "windows")]
+const USE_CUSTOM_PANEL_ROUNDING: bool = false;
+#[cfg(not(target_os = "windows"))]
+const USE_CUSTOM_PANEL_ROUNDING: bool = true;
+
 use crate::avatars::load_avatar_texture;
 use crate::config::helium_config_dir;
 use crate::constants::*;
@@ -203,13 +208,24 @@ impl eframe::App for HeliumApp {
             .show(ctx, |ui| {
                 let panel_rect = ui.max_rect();
                 let painter = ui.painter();
-                painter.rect_filled(panel_rect, CornerRadius::same(30), PANEL_BG);
-                painter.rect_stroke(
-                    panel_rect,
-                    CornerRadius::same(30),
-                    Stroke::new(1.0, Color32::from_rgb(0x2f, 0x2f, 0x2f)),
-                    StrokeKind::Inside,
-                );
+
+                if USE_CUSTOM_PANEL_ROUNDING {
+                    painter.rect_filled(panel_rect, CornerRadius::same(30), PANEL_BG);
+                    painter.rect_stroke(
+                        panel_rect,
+                        CornerRadius::same(30),
+                        Stroke::new(1.0, Color32::from_rgb(0x2f, 0x2f, 0x2f)),
+                        StrokeKind::Inside,
+                    );
+                } else {
+                    painter.rect_filled(panel_rect, 0.0, PANEL_BG);
+                    painter.rect_stroke(
+                        panel_rect,
+                        0.0,
+                        Stroke::new(1.0, Color32::from_rgb(0x2f, 0x2f, 0x2f)),
+                        StrokeKind::Inside,
+                    );
+                }
 
                 ui.scope_builder(
                     egui::UiBuilder::new().max_rect(panel_rect.shrink(PANEL_INNER_PADDING)),
