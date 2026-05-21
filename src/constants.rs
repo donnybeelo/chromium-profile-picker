@@ -20,5 +20,5 @@ pub(crate) const CARD_MARGIN_X: f32 = 15.0;
 pub(crate) const PANEL_INNER_PADDING: f32 = 20.0;
 pub(crate) const HEADER_HEIGHT: f32 = 40.0;
 pub(crate) const URL_ROW_HEIGHT: f32 = 38.0;
-pub(crate) const CONTENT_GAP: f32 = 8.0;
+pub(crate) const CONTENT_GAP: f32 = 4.0;
 pub(crate) const PROFILE_ROW_GAP: f32 = 16.0;
