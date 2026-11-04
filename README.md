@@ -19,11 +19,37 @@ A cross-platform good-looking profile picker for Chromium-based browsers, writte
 
 ## Installation
 
+On Linux and macOS, run:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/donnybeelo/chromium-profile-picker/main/install.sh | sh
+```
+
+On Windows, run this in PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/donnybeelo/chromium-profile-picker/main/install.ps1 | iex
+```
+
+Both ask which browser you use, install `chromium-profile-picker` for your user, and update it when ran again.
+
+To skip the question, pass the browser from the table above:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/donnybeelo/chromium-profile-picker/main/install.sh | sh -s -- helium
+```
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/donnybeelo/chromium-profile-picker/main/install.ps1))) helium
+```
+
+To build from source instead:
+
 ```bash
 cargo install --git https://github.com/donnybeelo/chromium-profile-picker --no-default-features --features helium
 ```
 
-Replace `helium` with the feature for your browser. Only one feature should be active at a time.
+Only one feature should be active at a time.
 
 ### Linux
 
@@ -31,7 +57,7 @@ Locate your `.desktop` file for your browser and set `chromium-profile-picker` a
 
 ### Windows
 
-Run once after installing to register the app and open the Default apps settings page:
+The install script does this for you. If you built from source, run this once after installing to register the app and open the Default apps settings page:
 
 ```powershell
 chromium-profile-picker --set-default
