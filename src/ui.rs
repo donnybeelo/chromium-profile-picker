@@ -12,6 +12,7 @@ pub(crate) fn fit_inside(container: Rect, image_size: Vec2) -> Rect {
 }
 
 pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>, app: &mut crate::app::App) {
+    let pal = palette(ctx);
     let width = ui.available_width();
     let height = HEADER_HEIGHT;
     let (rect, _) = ui.allocate_exact_size(Vec2::new(width, height), Sense::hover());
@@ -62,7 +63,7 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>, 
                 egui::Align2::CENTER_CENTER,
                 &app.title,
                 title_font.clone(),
-                TEXT,
+                pal.text,
             );
         }
     }
@@ -74,17 +75,18 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>, 
 }
 
 pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str, app: &mut crate::app::App, ctx: &egui::Context) {
+    let pal = palette(ctx);
     let painter = ui.painter_at(rect);
     let inner = rect.shrink(1.0);
     painter.rect_filled(
         inner,
         CornerRadius::same(19),
-        Color32::from_rgb(0x30, 0x30, 0x30),
+        pal.url_bg,
     );
     painter.rect_stroke(
         inner,
         CornerRadius::same(19),
-        Stroke::new(1.0, BORDER),
+        Stroke::new(1.0, pal.border),
         StrokeKind::Outside,
     );
 
@@ -111,7 +113,7 @@ pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str, app: &mut crate:
                         egui::Label::new(
                             egui::RichText::new(url)
                                 .font(egui::FontId::proportional(14.0))
-                                .color(TEXT)
+                                .color(pal.text)
                                 .monospace(),
                         )
                         .selectable(false)
@@ -129,15 +131,16 @@ pub(crate) fn profile_card(
     index: usize,
     avatar: Option<&AvatarImage>,
 ) -> Response {
+    let pal = palette(ui.ctx());
     let response = ui.interact(rect, ui.id().with(("profile_card", index)), Sense::click());
     let painter = ui.painter_at(rect);
     let hovered = ui.rect_contains_pointer(rect);
     let clicked = response.is_pointer_button_down_on();
 
     let bg = if clicked {
-        CARD_BG_CLICKED
+        pal.card_bg_clicked
     } else if hovered {
-        CARD_BG_HOVER
+        pal.card_bg_hover
     } else {
         Color32::TRANSPARENT
     };
@@ -146,11 +149,11 @@ pub(crate) fn profile_card(
     let avatar_size = Vec2::splat(122.0);
     let avatar_rect =
         Rect::from_center_size(Pos2::new(rect.center().x, rect.top() + 78.0), avatar_size);
-    painter.rect_filled(avatar_rect, CornerRadius::same(18), AVATAR_BG);
+    painter.rect_filled(avatar_rect, CornerRadius::same(18), pal.avatar_bg);
     painter.rect_stroke(
         avatar_rect,
         CornerRadius::same(18),
-        Stroke::new(1.0, BORDER),
+        Stroke::new(1.0, pal.border),
         StrokeKind::Outside,
     );
 
@@ -169,7 +172,7 @@ pub(crate) fn profile_card(
             egui::Align2::CENTER_CENTER,
             initials(&profile.name),
             egui::FontId::proportional(24.0),
-            MUTED_TEXT,
+            pal.muted_text,
         );
     }
 
@@ -183,11 +186,11 @@ pub(crate) fn profile_card(
         ),
         Vec2::new(BADGE_WIDTH, BADGE_HEIGHT),
     );
-    painter.rect_filled(badge_rect, CornerRadius::same(12), BADGE_BG);
+    painter.rect_filled(badge_rect, CornerRadius::same(12), pal.badge_bg);
     painter.rect_stroke(
         badge_rect,
         CornerRadius::same(12),
-        Stroke::new(1.0, BADGE_BORDER),
+        Stroke::new(1.0, pal.badge_border),
         StrokeKind::Inside,
     );
     painter.text(
@@ -199,7 +202,7 @@ pub(crate) fn profile_card(
             "0".to_string()
         }),
         egui::FontId::proportional(13.0),
-        Color32::WHITE,
+        pal.badge_text,
     );
 
     let name_pos = Pos2::new(rect.center().x, rect.bottom() - 26.0);
@@ -208,7 +211,7 @@ pub(crate) fn profile_card(
         egui::Align2::CENTER_CENTER,
         &profile.name,
         egui::FontId::proportional(15.0),
-        TEXT,
+        pal.text,
     );
 
     response
@@ -218,13 +221,14 @@ pub(crate) fn draw_circle_close_button(ui: &mut egui::Ui, rect: Rect) -> Respons
     let response = ui.allocate_rect(rect, Sense::click());
     let painter = ui.painter_at(rect);
     let hovered = ui.rect_contains_pointer(rect);
-    let fill = if hovered { CLOSE_BG_HOVER } else { CLOSE_BG };
+    let pal = palette(ui.ctx());
+    let fill = if hovered { pal.close_bg_hover } else { pal.close_bg };
     let center = rect.center();
     let radius = rect.width() / 2.0 - 1.5;
     painter.circle_filled(center, radius, fill);
-    painter.circle_stroke(center, radius, Stroke::new(1.0, BORDER));
+    painter.circle_stroke(center, radius, Stroke::new(1.0, pal.border));
 
-    let stroke = Stroke::new(2.0, TEXT);
+    let stroke = Stroke::new(2.0, pal.text);
     let d = 4.0;
     painter.line_segment(
         [

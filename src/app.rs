@@ -66,6 +66,12 @@ impl App {
     }
 
     pub(crate) fn into_running(mut self, cc: &eframe::CreationContext<'_>) -> Self {
+        let theme = match dark_light::detect() {
+            Ok(dark_light::Mode::Light) => egui::Theme::Light,
+            _ => egui::Theme::Dark,
+        };
+        cc.egui_ctx.set_theme(theme);
+
         for profile in &self.profiles {
             if let Some(path) = self.avatar_path_for(profile) {
                 let key = path.to_string_lossy().to_string();
@@ -174,11 +180,12 @@ impl eframe::App for App {
     }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let pal = palette(ctx);
         ctx.set_visuals(egui::Visuals {
             panel_fill: WINDOW_BG,
             window_fill: WINDOW_BG,
-            override_text_color: Some(MUTED_TEXT),
-            ..egui::Visuals::dark()
+            override_text_color: Some(pal.muted_text),
+            ..ctx.theme().default_visuals()
         });
         ctx.request_repaint();
 
@@ -214,19 +221,19 @@ impl eframe::App for App {
                 let painter = ui.painter();
 
                 if cfg!(not(target_os = "windows")) {
-                    painter.rect_filled(panel_rect, CornerRadius::same(30), PANEL_BG);
+                    painter.rect_filled(panel_rect, CornerRadius::same(30), pal.panel_bg);
                     painter.rect_stroke(
                         panel_rect,
                         CornerRadius::same(30),
-                        Stroke::new(1.0, Color32::from_rgb(0x2f, 0x2f, 0x2f)),
+                        Stroke::new(1.0, pal.panel_border),
                         StrokeKind::Inside,
                     );
                 } else {
-                    painter.rect_filled(panel_rect, 0.0, PANEL_BG);
+                    painter.rect_filled(panel_rect, 0.0, pal.panel_bg);
                     painter.rect_stroke(
                         panel_rect,
                         0.0,
-                        Stroke::new(1.0, Color32::from_rgb(0x2f, 0x2f, 0x2f)),
+                        Stroke::new(1.0, pal.panel_border),
                         StrokeKind::Inside,
                     );
                 }
@@ -243,7 +250,7 @@ impl eframe::App for App {
                                 ui.add_space(12.0);
                                 ui.label(
                                     egui::RichText::new(err)
-                                        .color(Color32::from_rgb(0xff, 0x95, 0x95)),
+                                        .color(pal.error_text),
                                 );
                             }
                         });

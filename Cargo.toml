@@ -23,6 +23,7 @@ serde_json = "1"
 sha1 = "0.10"
 anyhow = "1"
 dirs = "5"
+dark-light = "3"
 hex = "0.4"
 
 [target.'cfg(windows)'.dependencies]
