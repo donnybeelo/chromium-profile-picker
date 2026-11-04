@@ -67,8 +67,8 @@ impl App {
 
     pub(crate) fn into_running(mut self, cc: &eframe::CreationContext<'_>) -> Self {
         let theme = match dark_light::detect() {
-            Ok(dark_light::Mode::Light) => egui::Theme::Light,
-            _ => egui::Theme::Dark,
+            Ok(dark_light::Mode::Dark) | Err(_) => egui::Theme::Dark,
+            Ok(_) => egui::Theme::Light,
         };
         cc.egui_ctx.set_theme(theme);
 
